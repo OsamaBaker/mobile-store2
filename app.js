@@ -1,99 +1,125 @@
-Mobile.all = [];
-let price = 0;
-let condition = undefined;
+let allMobiles = []
 
-// Constructor Object
-function Mobile(name, type) {
-  (this.name = name), (this.type = type),(this.price = getRndPrice(100,500)) , Mobile.all.push(this);
+// Constructor function
+function Mobile(name, type){
+  this.name = name,
+  this.type = type,
+  this.price = [],
+  this.condition = [],
+
+  allMobiles.push(this),
+  settingItem();
 }
 
-function getRndPrice(min, max) {
-    return Math.floor(Math.random() * (500 - 100) ) + 100;
+// Random price generator
+Mobile.prototype.getRndPrice = function () {
+  this.price.push(Math.floor(Math.random() * (500 - 100) ) + 100);
+}
+
+// Condition declaration function
+Mobile.prototype.declareCondition = function () {
+  if(this.price < 200){
+    this.condition.push('Old');
+  } else {
+    this.condition.push('New');
   }
+}
 
+// get result div to that will render the input
+const resultDiv = document.getElementById('resultDiv');
 
+// get form
+const form = document.getElementById('form');
 
+// adding event listener to the form
+form.addEventListener('submit', submitter);
 
-
-
-// Getting input fields and submit button by ID and form
-const form = document.getElementById("form");
-
-// Adding event listener to the submit button
-form.addEventListener("submit", submitter);
-
-// Submitter Function
-function submitter(event) {
+function submitter (event) {
   event.preventDefault();
 
-  let username = event.target.username.value;
+  let name = event.target.username.value;
   let type = event.target.type.value;
 
-  
+  let newInstance = new Mobile(name, type);
+  newInstance.getRndPrice();
+  newInstance.declareCondition();
 
-  const newMobile = new Mobile(username, type);
-
-  localStorage.setItem("mobile", JSON.stringify(Mobile.all));
-
-  render();
+  newInstance.render();
 
 }
 
-// getting render region by id
-const renderRegion = document.getElementById("renderRegion");
+function settingItem(){
+  let setArr = JSON.stringify(allMobiles)
+  localStorage.setItem('mobile', setArr)
+}
 
-// creating render table and appending it to renderRegion
-const table = document.createElement("table");
-renderRegion.appendChild(table);
 
-let headerRow = document.createElement("tr");
+//creating render table
+const table = document.createElement('table');
+resultDiv.appendChild(table);
+
+const headerRow = document.createElement('tr');
 table.appendChild(headerRow);
 
-let firstTh = document.createElement("th");
+const firstTh = document.createElement('th');
 headerRow.appendChild(firstTh);
-firstTh.textContent = "UserName";
+firstTh.textContent = 'Username';
 
-let secondTh = document.createElement("th");
+const secondTh = document.createElement('th');
 headerRow.appendChild(secondTh);
-secondTh.textContent = "Type";
+secondTh.textContent = 'Type';
 
-let thirdTh = document.createElement("th");
+const thirdTh = document.createElement('th');
 headerRow.appendChild(thirdTh);
-thirdTh.textContent = "Price";
+thirdTh.textContent = 'Price';
 
-let fourthTh = document.createElement("th");
+const fourthTh = document.createElement('th');
 headerRow.appendChild(fourthTh);
-fourthTh.textContent = "Condition";
+fourthTh.textContent = 'Condition';
 
-function render() {
-    
-  let dataArray = [];
-  dataArray = JSON.parse(localStorage.getItem("mobile"));
-
-
-  for (let i = 0; i < dataArray.length; i++) {
+// Render function
+Mobile.prototype.render = function () {
   
-    let firstRow = document.createElement("tr");
-    table.appendChild(firstRow);
+  let firstRow = document.createElement('tr');
+  table.appendChild(firstRow);
+  // console.log(firstRow)
 
-    let firstTd = document.createElement("td");
-    firstRow.appendChild(firstTd);
+  let rowFirstTd = document.createElement('td');
+  firstRow.appendChild(rowFirstTd);
 
-    firstTd.textContent = `${dataArray[i].name}`;
+  let rowSecondTd = document.createElement('td');
+  firstRow.appendChild(rowSecondTd);
 
-    let secondTd = document.createElement('tr')
-    firstRow.appendChild(secondTd)
-    secondTd.textContent = `${dataArray[i].type}`
+  let rowThirdTd = document.createElement('td');
+  firstRow.appendChild(rowThirdTd);
 
-    let thirdTd = document.createElement('td');
-    firstRow.appendChild(thirdTd);
-    thirdTd.textContent = `${dataArray[i].price}`
-    
+  let rowFourthTd = document.createElement('td');
+  firstRow.appendChild(rowFourthTd);
+
+  for(let i = 0; i < allMobiles.length; i++){
+
+    rowFirstTd.textContent = this.name;
+    rowSecondTd.textContent = this.type;
+    rowThirdTd.textContent = this.price;
+    rowFourthTd.textContent = this.condition;
+  }
+
+}
+
+function gettingItem() {
+  let data = localStorage.getItem('mobile');
+  let getArr = JSON.parse(data);
+
+  if (getArr) {
+      for (let i = 0; i < getArr.length; i++) {
+          new Mobile(getArr[i].name, getArr[i].type);
+      }
   }
 }
 
-if (localStorage.getItem("mobile")) {
-  Mobile.all = JSON.parse(localStorage.getItem("mobile"));
-  render();
-}
+gettingItem();
 
+for (let i = 0; i < allMobiles.length; i++) {
+  
+  allMobiles[i].render();
+}
